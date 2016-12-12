@@ -16,9 +16,19 @@ ADoppelWorld::ADoppelWorld()
 	Box = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	RootComponent = Box;
 
-	width = 6;
 	height = 6;
+	width = 6;
 	num_doppees = 10;
+
+	for (int i = 0; i < height; i++) {
+		TArray<int> tile_row, wall_row;
+
+		tile_row.Init(e_tiles::T_GROUND, width);
+		tile_map.Add(tile_row);
+
+		wall_row.Init(e_walls::W_EMPTY, width);
+		wall_map.Add(wall_row);
+	}
 }
 
 // Called when the game starts or when spawned
