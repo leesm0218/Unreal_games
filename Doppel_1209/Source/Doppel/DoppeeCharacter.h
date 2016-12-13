@@ -45,7 +45,7 @@ public:
 	
 private:
 	POINT curr_position = { -1, -1 };
-	POINT next_position = { -1, -1 };
+	POINT next_position = { 0, 0 };
 
 	UAnimationAsset *idle_anim, *walk_anim;
 	class ADoppelWorld* parent_world;

@@ -16,15 +16,45 @@ ADoppelWorld::ADoppelWorld()
 	Box = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	RootComponent = Box;
 
-	width = 6;
-	height = 6;
-	num_doppees = 10;
+	num_doppees = 40;
+
+	width = ceil(sqrt((double)num_doppees)*2);//제곱근 *2를 올림. 40->6.x->12.x->13
+	height = width;
+	/*
+	for (int i = 0; i < height; i++) {
+		TArray<e_tiles> tile_row;
+		TArray<e_walls> wall_row;
+
+		tile_row.Init(e_tiles::T_GROUND, width);
+		tile_map.Add(tile_row);
+
+		wall_row.Init(e_walls::W_EMPTY, width);
+		wall_map.Add(wall_row);
+	}*/
 }
 
 // Called when the game starts or when spawned
 void ADoppelWorld::BeginPlay()
 {
 	Super::BeginPlay();
+	/*
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; i < width; i++) {
+			switch (tile_map[i][j]) {
+			case e_tiles::T_EMPTY:
+				break;
+			case e_tiles::T_GROUND:
+				break;
+			default:
+				break;
+			}
+		}
+	}*/
+	for (int i = 0; i < width; i++)
+	{
+		disable_point.Add({ i, 7 });
+	}
+
 
 	for (int i = 0; i < num_doppees; i++) {
 		POINT rand_position;
@@ -127,15 +157,29 @@ void ADoppelWorld::moveRight()
 
 void ADoppelWorld::move(POINT dir)
 {
-	my_doppee->moveNext(dir);
+	if(Beforedirs.x != dir.x || Beforedirs.y != dir.y)
+	{
+		for (auto doppee : doppees) {
+			if (doppee != my_doppee) {
+				POINT Rdir = dirs[FMath::Rand() % e_dirs::COUNT];
+				doppee->moveNext(Rdir);
+			}
+			else
+			{
+				doppee->moveNext(dir);
+			}
 
-	for (auto doppee : doppees) {
-		POINT dir = dirs[FMath::Rand() % e_dirs::COUNT];
-
-		if (doppee != my_doppee) {
-			doppee->moveNext(dir);
+			for (POINT p : disable_point)
+			{
+				if (doppee->getNextPosition().x == p.x && doppee->getNextPosition().y == p.y)
+				{
+					doppee->setNextPosition(doppee->getPosition());
+				}
+			}
 		}
-	}
 
+		Beforedirs.x = dir.x * -1;
+		Beforedirs.y = dir.y * -1;
+	}
 	update();
 }

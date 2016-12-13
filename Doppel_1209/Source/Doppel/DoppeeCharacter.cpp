@@ -55,21 +55,26 @@ void ADoppeeCharacter::swapPosition()
 	auto width = parent_world->width;
 	auto height = parent_world->height;
 
-	if (0 <= next_position.x && next_position.x < width &&
-		0 <= next_position.y && next_position.y < height) {
-		FVector Origin = Box->Bounds.Origin;
-		FVector Extent = Box->Bounds.BoxExtent;
-		SpawnLocation.X = Origin.X + 2 * Extent.X * next_position.x / width - Extent.X;
-		SpawnLocation.Y = Origin.Y + 2 * Extent.Y * next_position.y / height - Extent.Y;
-		SpawnLocation.Z = Origin.Z;
+	if (curr_position.x != next_position.x || curr_position.y != next_position.y)
+	{
+		if (0 <= next_position.x && next_position.x < width &&
+			0 <= next_position.y && next_position.y < height) {
+			FVector Origin = Box->Bounds.Origin;
+			FVector Extent = Box->Bounds.BoxExtent;
+			SpawnLocation.X = Origin.X + 2 * Extent.X * next_position.x / width - Extent.X;
+			SpawnLocation.Y = Origin.Y + 2 * Extent.Y * next_position.y / height - Extent.Y;
+			SpawnLocation.Z = Origin.Z;
 
-		targetLocation = SpawnLocation;
+			targetLocation = SpawnLocation;
+		
 
-		Move();
+			Move();
+			curr_position = next_position;
+		}
 		//GetMesh()->PlayAnimation(walk_anim, true);
 
 		//SetActorLocation(SpawnLocation);
-		curr_position = next_position;
+
 	}
 	
 	//FRotator rot = this->GetControlRotation();

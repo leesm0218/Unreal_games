@@ -23,6 +23,8 @@ public:
 		{ 0, 1 }
 	};
 
+	POINT Beforedirs = {0 , 0};
+
 public:	
 	// Sets default values for this actor's properties
 	ADoppelWorld();
@@ -50,9 +52,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Doppel")
 	TSubclassOf<class ADoppeeCharacter> WhatToSpawn;
 
-	UPROPERTY(EditAnywhere, Category = "Dumb")
-	TSubclassOf<class AActor> Wall;
-
 public:
 	UPROPERTY(EditAnywhere, Category = "Doppel")
 	int width;
@@ -69,4 +68,6 @@ private:
 
 	TArray<class ADoppeeCharacter*> doppees;
 	class ADoppeeCharacter* my_doppee = nullptr;
+
+	TArray<POINT> disable_point;
 };
