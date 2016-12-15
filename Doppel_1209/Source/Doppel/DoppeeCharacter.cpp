@@ -49,72 +49,28 @@ void ADoppeeCharacter::setParentWorld(ADoppelWorld* world)
 	parent_world = world;
 }
 
+void ADoppeeCharacter::moveNext(POINT dir)
+{
+	next_position = { curr_position.x + dir.x, curr_position.y + dir.y };
+}
+
 bool ADoppeeCharacter::canMoveDir(POINT dir)
 {
 	POINT target_porition = { curr_position.x + dir.x, curr_position.y + dir.y };
 
-	return canMoveNext(target_porition);
+	return parent_world->canMovePos(target_porition);
 }
 
 bool ADoppeeCharacter::canMoveNext()
 {
-	return canMoveNext(next_position);
+	return parent_world->canMovePos(next_position);
 }
 
 bool ADoppeeCharacter::isEmptyGoundDir(POINT dir)
 {
 	POINT target_porition = { curr_position.x + dir.x, curr_position.y + dir.y };
 
-	return isEmptyGound(target_porition);
-}
-
-bool ADoppeeCharacter::canMoveNext(POINT target_position)
-{
-	if (!isBoundery(target_position)) return false;
-
-	auto &tile_map = parent_world->getTileMap();
-	auto &t = target_position;
-
-	switch (tile_map[t.y][t.x]->getFloor())
-	{
-	case ATile::e_floors::T_GROUND:
-		return true;
-	default:
-		return false;
-	}
-}
-
-bool ADoppeeCharacter::isEmptyGound(POINT target_position)
-{
-	auto &t = target_position;
-	auto &doppees = parent_world->getDoppees();
-
-	for (auto &doppee : doppees) {
-		auto &curr_pos = doppee->getCurrPosition();
-		auto &next_pos = doppee->getNextPosition();
-
-		if ((next_pos.x != t.x || next_pos.y != t.y)) {
-			// keep loop
-		}
-		else {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool ADoppeeCharacter::isBoundery(POINT target_position)
-{
-	auto &width = parent_world->width;
-	auto &height = parent_world->height;
-
-	if (0 <= target_position.x && target_position.x < width &&
-		0 <= target_position.y && target_position.y < height) {
-		return true;
-	}
-
-	return false;
+	return parent_world->isEmptyGound(target_porition);
 }
 
 void ADoppeeCharacter::swapPosition()
@@ -124,35 +80,31 @@ void ADoppeeCharacter::swapPosition()
 	auto &tile_map = parent_world->getTileMap();
 	auto width = parent_world->width;
 	auto height = parent_world->height;
+	auto dir = POINT{ next_position.x - curr_position.x, next_position.y - curr_position.y };
+	dir.x = FMath::Sign(dir.x);
+	dir.y = FMath::Sign(dir.y);
+	FVector Origin = Box->Bounds.Origin;
+	FVector Extent = Box->Bounds.BoxExtent;
+	FVector doppee_extent = this->GetComponentsBoundingBox().GetExtent();
+	SpawnLocation.X = Origin.X + 2 * Extent.X * (next_position.x) / width - Extent.X + dir.x * doppee_extent.X / 2;
+	SpawnLocation.Y = Origin.Y + 2 * Extent.Y * (next_position.y) / height - Extent.Y + dir.y * doppee_extent.Y / 2;
+	//SpawnLocation.X = Origin.X + 2 * Extent.X * next_position.x / width - Extent.X;
+	//SpawnLocation.Y = Origin.Y + 2 * Extent.Y * next_position.y / height - Extent.Y;
+	SpawnLocation.Z = Origin.Z;
 
-	if (canMoveNext(next_position)) {
-		FVector Origin = Box->Bounds.Origin;
-		FVector Extent = Box->Bounds.BoxExtent;
-		SpawnLocation.X = Origin.X + 2 * Extent.X * next_position.x / width - Extent.X;
-		SpawnLocation.Y = Origin.Y + 2 * Extent.Y * next_position.y / height - Extent.Y;
-		SpawnLocation.Z = Origin.Z;
+	targetLocation = SpawnLocation;
 
-		targetLocation = SpawnLocation;
-
+	if (parent_world->canMovePos(next_position)) {
 		Move();
 		curr_position = next_position;
 	}
 	else {
-		FVector Origin = Box->Bounds.Origin;
-		FVector Extent = Box->Bounds.BoxExtent;
-		SpawnLocation.X = Origin.X + 2 * Extent.X * next_position.x / width - Extent.X;
-		SpawnLocation.Y = Origin.Y + 2 * Extent.Y * next_position.y / height - Extent.Y;
-		SpawnLocation.Z = Origin.Z;
-
-		targetLocation = SpawnLocation;
-
 		Turn();
 	}
-	
+
 	//FRotator rot = this->GetControlRotation();
 	//const FVector dir = FRotationMatrix(rot).GetScaledAxis(EAxis::X);
 
 	//AddMovementInput({ 1.0, 0.0, 0.0 }, 1.0);
-
 }
 

@@ -64,6 +64,51 @@ void ATile::BeginPlay()
 
 		break;
 	}
+	case e_floors::T_THORNS:
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+
+		FVector SpawnLocation = GetActorLocation();
+
+		FRotator SpawnRotation;
+		SpawnRotation.Yaw = 0.0f;
+		SpawnRotation.Pitch = 0.0f;
+		SpawnRotation.Roll = 0.0f;
+
+		AActor* floor =
+			GetWorld()->SpawnActor<AActor>(THORNS_BP, SpawnLocation, SpawnRotation, SpawnParams);
+		//auto scale = floor->GetActorScale();
+		//scale.Z = 2;
+		//floor->SetActorScale3D(scale);
+		objs.Add(floor);
+
+		break;
+	}
+	case e_floors::T_EXIT:
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+
+		FVector SpawnLocation = GetActorLocation();
+		SpawnLocation.Z += 100;
+
+		FRotator SpawnRotation;
+		SpawnRotation.Yaw = 0.0f;
+		SpawnRotation.Pitch = 0.0f;
+		SpawnRotation.Roll = 0.0f;
+
+		AActor* floor =
+			GetWorld()->SpawnActor<AActor>(EXIT_BP, SpawnLocation, SpawnRotation, SpawnParams);
+		//auto scale = floor->GetActorScale();
+		//scale.Z = 2;
+		//floor->SetActorScale3D(scale);
+		objs.Add(floor);
+
+		break;
+	}
 	default:
 		break;
 	}

@@ -15,6 +15,8 @@ public:
 		T_EMPTY,
 		T_GROUND,
 		T_PILLAR,
+		T_THORNS,
+		T_EXIT,
 		T_COUNT
 	};
 
@@ -29,6 +31,15 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Doppel")
 		TSubclassOf<class AActor> Floor_BP;
+
+	UPROPERTY(EditAnywhere, Category = "Doppel")
+		TSubclassOf<class AActor> PILLAR_BP;
+
+	UPROPERTY(EditAnywhere, Category = "Doppel")
+		TSubclassOf<class AActor> THORNS_BP;
+
+	UPROPERTY(EditAnywhere, Category = "Doppel")
+		TSubclassOf<class AActor> EXIT_BP;
 
 	/*UPROPERTY(EditAnywhere, Category = "Doppel")
 		TSubclassOf<class AActor> Wall_BP;*/
