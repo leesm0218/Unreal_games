@@ -38,6 +38,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Doppel")
 	FVector GetRandomPointInWorld();
 	inline class UBoxComponent* getBox() { return Box; }
+	inline TArray<class ADoppeeCharacter*>& getDoppees() { return doppees; }
+	inline TArray<TArray<class ATile*>>& getTileMap() { return tile_map; }
 
 
 	void moveUp();

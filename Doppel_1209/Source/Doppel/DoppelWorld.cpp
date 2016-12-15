@@ -7,6 +7,8 @@
 
 #include "kismet/KismetMathLibrary.h"
 
+#include <algorithm>
+
 
 // Sets default values
 ADoppelWorld::ADoppelWorld()
@@ -59,7 +61,7 @@ void ADoppelWorld::BeginPlay()
 
 			ATile* tile = GetWorld()->SpawnActor<ATile>(Tile_BP, SpawnLocation, SpawnRotation, SpawnParams);
 			tile->setParentWorld(this);
-			if (i == 3 && j == 3) {
+			if (i % 3 == 0 && j % 3 == 0) {
 				tile->setFloor(ATile::e_floors::T_PILLAR);
 			}
 			else {
@@ -76,9 +78,14 @@ void ADoppelWorld::BeginPlay()
 		while (1) {
 			bool finded = false;
 			rand_position = { FMath::Rand() % width, FMath::Rand() % height };
+			auto &r = rand_position;
+
+			if (tile_map[r.y][r.x]->getFloor() != ATile::e_floors::T_GROUND) {
+				continue;
+			}
 
 			for (auto doppee : doppees) {
-				auto doppee_position = doppee->getPosition();
+				auto doppee_position = doppee->getCurrPosition();
 
 				if (doppee_position.x == rand_position.x && doppee_position.y == rand_position.y) {
 					finded = true;
@@ -172,12 +179,21 @@ void ADoppelWorld::moveRight()
 void ADoppelWorld::move(POINT dir)
 {
 	my_doppee->moveNext(dir);
-
+	
 	for (auto doppee : doppees) {
-		POINT dir = dirs[FMath::Rand() % e_dirs::COUNT];
-
 		if (doppee != my_doppee) {
-			doppee->moveNext(dir);
+			int num_arr[] = { 0, 1, 2, 3 };
+
+			std::random_shuffle(num_arr, num_arr + 4);
+
+			for (int i = 0; i < e_dirs::COUNT; i++) {
+				POINT rand_dir = dirs[num_arr[i]];
+
+				if (doppee->canMoveDir(rand_dir) && doppee->isEmptyGoundDir(rand_dir)) {
+					doppee->moveNext(rand_dir);
+					break;
+				}
+			}
 		}
 	}
 
