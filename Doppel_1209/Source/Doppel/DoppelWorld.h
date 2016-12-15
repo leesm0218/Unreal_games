@@ -23,8 +23,6 @@ public:
 		{ 0, 1 }
 	};
 
-	POINT Beforedirs = {0 , 0};
-
 public:	
 	// Sets default values for this actor's properties
 	ADoppelWorld();
@@ -40,6 +38,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Doppel")
 	FVector GetRandomPointInWorld();
 	inline class UBoxComponent* getBox() { return Box; }
+	inline TArray<class ADoppeeCharacter*>& getDoppees() { return doppees; }
+	inline TArray<TArray<class ATile*>>& getTileMap() { return tile_map; }
 
 
 	void moveUp();
@@ -50,7 +50,10 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Doppel")
-	TSubclassOf<class ADoppeeCharacter> WhatToSpawn;
+		TSubclassOf<class ADoppeeCharacter> WhatToSpawn;
+
+	UPROPERTY(EditAnywhere, Category = "Doppel")
+		TSubclassOf<class ATile> Tile_BP;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Doppel")
@@ -69,5 +72,5 @@ private:
 	TArray<class ADoppeeCharacter*> doppees;
 	class ADoppeeCharacter* my_doppee = nullptr;
 
-	TArray<POINT> disable_point;
+	TArray<TArray<class ATile*>> tile_map;
 };

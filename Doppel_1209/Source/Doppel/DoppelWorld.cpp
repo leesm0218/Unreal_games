@@ -3,8 +3,11 @@
 #include "Doppel.h"
 #include "DoppelWorld.h"
 #include "DoppeeCharacter.h"
+#include "Tile.h"
 
 #include "kismet/KismetMathLibrary.h"
+
+#include <algorithm>
 
 
 // Sets default values
@@ -16,14 +19,12 @@ ADoppelWorld::ADoppelWorld()
 	Box = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	RootComponent = Box;
 
-	num_doppees = 40;
-
-	width = ceil(sqrt((double)num_doppees)*2);//제곱근 *2를 올림. 40->6.x->12.x->13
-	height = width;
+	height = 6;
+	width = 6;
+	num_doppees = 10;
 	/*
 	for (int i = 0; i < height; i++) {
-		TArray<e_tiles> tile_row;
-		TArray<e_walls> wall_row;
+		TArray<int> tile_row, wall_row;
 
 		tile_row.Init(e_tiles::T_GROUND, width);
 		tile_map.Add(tile_row);
@@ -37,24 +38,39 @@ ADoppelWorld::ADoppelWorld()
 void ADoppelWorld::BeginPlay()
 {
 	Super::BeginPlay();
-	/*
+	
 	for (int i = 0; i < height; i++) {
-		for (int j = 0; i < width; i++) {
-			switch (tile_map[i][j]) {
-			case e_tiles::T_EMPTY:
-				break;
-			case e_tiles::T_GROUND:
-				break;
-			default:
-				break;
-			}
-		}
-	}*/
-	for (int i = 0; i < width; i++)
-	{
-		disable_point.Add({ i, 7 });
-	}
+		tile_map.Add(TArray<ATile*>());
 
+		for (int j = 0; j < width; j++) {
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
+
+			FVector SpawnLocation;
+			FVector Origin = Box->Bounds.Origin;
+			FVector Extent = Box->Bounds.BoxExtent;
+			SpawnLocation.X = Origin.X + 2 * Extent.X * i / width - Extent.X;
+			SpawnLocation.Y = Origin.Y + 2 * Extent.Y * j / height - Extent.Y;
+			SpawnLocation.Z = Origin.Z / 2;
+
+			FRotator SpawnRotation;
+			SpawnRotation.Yaw = 0.0f;
+			SpawnRotation.Pitch = 0.0f;
+			SpawnRotation.Roll = 0.0f;
+
+			ATile* tile = GetWorld()->SpawnActor<ATile>(Tile_BP, SpawnLocation, SpawnRotation, SpawnParams);
+			tile->setParentWorld(this);
+			if (i % 3 == 0 && j % 3 == 0) {
+				tile->setFloor(ATile::e_floors::T_PILLAR);
+			}
+			else {
+				tile->setFloor(ATile::e_floors::T_GROUND);
+			}
+
+			tile_map[i].Add(tile);
+		}
+	}
 
 	for (int i = 0; i < num_doppees; i++) {
 		POINT rand_position;
@@ -62,9 +78,14 @@ void ADoppelWorld::BeginPlay()
 		while (1) {
 			bool finded = false;
 			rand_position = { FMath::Rand() % width, FMath::Rand() % height };
+			auto &r = rand_position;
+
+			if (tile_map[r.y][r.x]->getFloor() != ATile::e_floors::T_GROUND) {
+				continue;
+			}
 
 			for (auto doppee : doppees) {
-				auto doppee_position = doppee->getPosition();
+				auto doppee_position = doppee->getCurrPosition();
 
 				if (doppee_position.x == rand_position.x && doppee_position.y == rand_position.y) {
 					finded = true;
@@ -157,29 +178,24 @@ void ADoppelWorld::moveRight()
 
 void ADoppelWorld::move(POINT dir)
 {
-	if(Beforedirs.x != dir.x || Beforedirs.y != dir.y)
-	{
-		for (auto doppee : doppees) {
-			if (doppee != my_doppee) {
-				POINT Rdir = dirs[FMath::Rand() % e_dirs::COUNT];
-				doppee->moveNext(Rdir);
-			}
-			else
-			{
-				doppee->moveNext(dir);
-			}
+	my_doppee->moveNext(dir);
+	
+	for (auto doppee : doppees) {
+		if (doppee != my_doppee) {
+			int num_arr[] = { 0, 1, 2, 3 };
 
-			for (POINT p : disable_point)
-			{
-				if (doppee->getNextPosition().x == p.x && doppee->getNextPosition().y == p.y)
-				{
-					doppee->setNextPosition(doppee->getPosition());
+			std::random_shuffle(num_arr, num_arr + 4);
+
+			for (int i = 0; i < e_dirs::COUNT; i++) {
+				POINT rand_dir = dirs[num_arr[i]];
+
+				if (doppee->canMoveDir(rand_dir) && doppee->isEmptyGoundDir(rand_dir)) {
+					doppee->moveNext(rand_dir);
+					break;
 				}
 			}
 		}
-
-		Beforedirs.x = dir.x * -1;
-		Beforedirs.y = dir.y * -1;
 	}
+
 	update();
 }
