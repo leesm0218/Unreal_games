@@ -49,6 +49,13 @@ void ADoppelWorld::init()
 	height = now_stage->height;
 	num_doppees = now_stage->num_doppees;
 
+	doppees.Reset(0);
+	my_doppee = nullptr;
+	tile_map.Reset(0);
+
+	// now_stage_i = 0;
+	isNotInput = 0;
+
 	settingTileMap();
 	settingDoppees();
 	update();
@@ -175,7 +182,7 @@ void ADoppelWorld::Tick( float DeltaTime )
 			doppee->Die();
 			endMove();
 
-			// ÆÐ¹è
+			Die();
 		}
 		else {
 			doppees.Remove(doppee);
@@ -190,7 +197,7 @@ void ADoppelWorld::Tick( float DeltaTime )
 			doppee->Die();
 			endMove();
 
-			// ½Â¸®
+			Win();
 		}
 		else {
 			doppees.Remove(doppee);

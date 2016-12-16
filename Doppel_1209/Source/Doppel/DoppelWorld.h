@@ -78,6 +78,12 @@ protected:
 		TSubclassOf<class ATile> Tile_BP;
 
 public:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Doppel")
+		void Win();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Doppel")
+		void Die();
+
 	/*UPROPERTY(EditAnywhere, Category = "Doppel")
 	int width;
 
