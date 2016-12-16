@@ -46,7 +46,12 @@ public:
 		void startMove() { isNotInput++; }
 
 	UFUNCTION(BlueprintCallable, Category = "Doppel")
-		void endMove() { if (isNotInput > 0) isNotInput--; }
+		void endMove() {
+			//stageCheck();
+			if (isNotInput > 0) {
+				isNotInput--;
+			}
+		}
 
 	inline class UBoxComponent* getBox() { return Box; }
 	inline TArray<class ADoppeeCharacter*>& getDoppees() { return doppees; }
@@ -62,6 +67,8 @@ public:
 	bool canMovePos(POINT target_position);
 	bool isEmptyGound(POINT target_position);
 	bool isBoundery(POINT target_position);
+
+	void stageCheck();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Doppel")

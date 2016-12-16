@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Doppel")
 		void Turn();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Doppel")
+		void Die();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Doppel", meta = (AllowPrivateAccess = "true"))
 		class ADoppelWorld* parent_world;
 

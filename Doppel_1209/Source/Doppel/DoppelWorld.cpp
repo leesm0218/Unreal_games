@@ -19,17 +19,17 @@ ADoppelWorld::ADoppelWorld()
 
 	Box = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	RootComponent = Box;
-	stage_infos.Add(new StageInfo(10, 10, 10, {
+	stage_infos.Add(new StageInfo(10, 10, 15, {
 		{ 1, 2, 1, 1, 1, 1, 1, 1, 1, 1 },
 		{ 1, 2, 1, 1, 1, 1, 1, 2, 1, 1 },
-		{ 1, 2, 2, 2, 1, 1, 1, 2, 1, 1 },
-		{ 1, 1, 1, 1, 1, 1, 1, 2, 1, 1 },
-		{ 1, 2, 1, 1, 2, 2, 2, 2, 1, 1 },
-		{ 1, 1, 1, 1, 1, 1, 2, 1, 1, 1 },
-		{ 1, 1, 1, 1, 1, 1, 2, 1, 1, 1 },
+		{ 1, 2, 2, 2, 1, 3, 1, 2, 1, 1 },
+		{ 1, 3, 1, 1, 1, 2, 1, 2, 1, 1 },
+		{ 1, 2, 1, 2, 2, 2, 1, 2, 1, 1 },
+		{ 1, 1, 1, 3, 1, 1, 1, 1, 1, 1 },
+		{ 1, 1, 1, 3, 1, 1, 1, 1, 1, 1 },
 		{ 1, 2, 2, 2, 2, 2, 2, 1, 1, 1 },
-		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-		{ 1, 2, 1, 1, 1, 1, 1, 1, 3, 4 },
+		{ 1, 3, 1, 1, 1, 3, 1, 1, 1, 1 },
+		{ 1, 2, 1, 3, 1, 1, 1, 1, 2, 4 },
 	}));
 }
 
@@ -99,7 +99,7 @@ void ADoppelWorld::settingDoppees()
 		while (1) {
 			bool finded = false;
 			rand_position = { FMath::Rand() % width, FMath::Rand() % height };
-			if (tile_map[rand_position.y][rand_position.x]->getFloor() == ATile::e_floors::T_GROUND) {
+			if (tile_map[rand_position.y][rand_position.x]->getFloor() == ATile::e_floors::T_GROUND && isEmptyGound(rand_position)) {
 				break;
 			}
 		}
@@ -146,6 +146,59 @@ void ADoppelWorld::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	TArray<ADoppeeCharacter*> thorns_indexes;
+	TArray<ADoppeeCharacter*> exit_indexes;
+
+	for (auto &doppee : doppees) {
+		auto &curr_pos = doppee->getCurrPosition();
+
+		switch (tile_map[curr_pos.y][curr_pos.x]->getFloor())
+		{
+		case ATile::e_floors::T_THORNS:
+		{
+			thorns_indexes.Add(doppee);
+			break;
+		}
+		case ATile::e_floors::T_EXIT:
+		{
+			exit_indexes.Add(doppee);
+			break;
+		}
+		default:
+			break;
+		}
+	}
+
+	for (auto &doppee : thorns_indexes) {
+		if (doppee == my_doppee) {
+			doppees.Remove(doppee);
+			doppee->Die();
+			endMove();
+
+			// ÆÐ¹è
+		}
+		else {
+			doppees.Remove(doppee);
+			doppee->Die();
+			endMove();
+		}
+		//delete doppee;
+	}
+	for (auto &doppee : exit_indexes) {
+		if (doppee == my_doppee) {
+			doppees.Remove(doppee);
+			doppee->Die();
+			endMove();
+
+			// ½Â¸®
+		}
+		else {
+			doppees.Remove(doppee);
+			doppee->Die();
+			endMove();
+		}
+		//delete doppee;
+	}
 }
 
 void ADoppelWorld::update()
@@ -260,4 +313,61 @@ bool ADoppelWorld::isBoundery(POINT target_position)
 	}
 
 	return false;
+}
+
+void ADoppelWorld::stageCheck()
+{
+	TArray<ADoppeeCharacter*> thorns_indexes;
+	TArray<ADoppeeCharacter*> exit_indexes;
+
+	for (auto &doppee : doppees) {
+		auto &curr_pos = doppee->getCurrPosition();
+
+		switch (tile_map[curr_pos.y][curr_pos.x]->getFloor())
+		{
+		case ATile::e_floors::T_THORNS:
+		{
+			thorns_indexes.Add(doppee);
+			break;
+		}
+		case ATile::e_floors::T_EXIT:
+		{
+			exit_indexes.Add(doppee);
+			break;
+		}
+		default:
+			break;
+		}
+	}
+
+	for (auto &doppee : thorns_indexes) {
+		if (doppee == my_doppee) {
+			doppees.Remove(doppee);
+			doppee->Die();
+			endMove();
+
+			// ÆÐ¹è
+		}
+		else {
+			doppees.Remove(doppee);
+			doppee->Die();
+			endMove();
+		}
+		//delete doppee;
+	}
+	for (auto &doppee : exit_indexes) {
+		if (doppee == my_doppee) {
+			doppees.Remove(doppee);
+			doppee->Die();
+			endMove();
+
+			// ½Â¸®
+		}
+		else {
+			doppees.Remove(doppee);
+			doppee->Die();
+			endMove();
+		}
+		//delete doppee;
+	}
 }
