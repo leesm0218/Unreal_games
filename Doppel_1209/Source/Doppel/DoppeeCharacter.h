@@ -29,14 +29,10 @@ public:
 	inline POINT& getNextPosition() { return next_position; }
 
 	inline void setNextPosition(POINT position) { next_position = position; }
-	inline void moveNext(POINT dir) { next_position = { curr_position.x + dir.x, curr_position.y + dir.y }; }
+	void moveNext(POINT dir);
 	bool canMoveDir(POINT dir);
 	bool canMoveNext();
 	bool isEmptyGoundDir(POINT dir);
-
-	bool canMoveNext(POINT target_position);
-	bool isEmptyGound(POINT target_position);
-	bool isBoundery(POINT target_position);
 
 	void swapPosition();
 
@@ -52,11 +48,19 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Doppel")
 		void Turn();
-	
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Doppel")
+		void Die();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Doppel")
+		void Die2();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Doppel", meta = (AllowPrivateAccess = "true"))
+		class ADoppelWorld* parent_world;
+
 private:
 	POINT curr_position = { -1, -1 };
 	POINT next_position = { -1, -1 };
 
 	UAnimationAsset *idle_anim, *walk_anim;
-	class ADoppelWorld* parent_world;
 };

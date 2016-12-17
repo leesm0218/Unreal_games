@@ -107,6 +107,7 @@ void ADoppelCharacter::SetupPlayerInputComponent(class UInputComponent* InputCom
 	InputComponent->BindAction("Down", IE_Pressed, this, &ADoppelCharacter::ArrowDown);
 	InputComponent->BindAction("Left", IE_Pressed, this, &ADoppelCharacter::ArrowLeft);
 	InputComponent->BindAction("Right", IE_Pressed, this, &ADoppelCharacter::ArrowRight);
+	InputComponent->BindAction("Restart", IE_Pressed, this, &ADoppelCharacter::Restart);
 }
 
 void ADoppelCharacter::ArrowUp()
@@ -141,6 +142,15 @@ void ADoppelCharacter::ArrowRight()
 	for (auto doppel_world : doppel_worlds) {
 		if (doppel_world) {
 			doppel_world->moveRight();
+		}
+	}
+}
+
+void ADoppelCharacter::Restart()
+{
+	for (auto doppel_world : doppel_worlds) {
+		if (doppel_world) {
+			doppel_world->init();
 		}
 	}
 }

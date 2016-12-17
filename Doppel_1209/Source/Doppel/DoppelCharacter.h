@@ -43,6 +43,7 @@ protected:
 	virtual void ArrowDown();
 	virtual void ArrowLeft();
 	virtual void ArrowRight();
+	virtual void Restart();
 
 	TArray<class ADoppelWorld*> doppel_worlds;
 };
